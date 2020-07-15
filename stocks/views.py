@@ -13,13 +13,16 @@ def home(request):
         today = datetime.date.today()
         d = datetime.timedelta(days = 30)
         startday = today - d
-    
-        df = yf.download(ticker, start=startday)
-        if len(df.index) > 0:
-            df1 = df.reset_index()
+        todaydata = yf.download(ticker, start=today)
+        todaydata.reset_index(inplace=True)
+        currentprice = round(todaydata.iloc[0]['Close'], 2)
+        monthdata = yf.download(ticker, start=startday)
+        if len(monthdata.index) > 0:
+            df = monthdata.reset_index()
             plt.clf()
-            plt.plot(df1.Date, df1.Close)
-            plt.xticks(rotation=30)
+            plt.plot(df.Date, df.Close)
+            plt.ylabel('Price (USD)')
+            plt.xticks(rotation=15)
             fig = plt.gcf()
             buf = io.BytesIO()
             fig.savefig(buf,format='png')
@@ -28,7 +31,7 @@ def home(request):
             uri =  urllib.parse.quote(string)
         else:
             uri = "Error"
-        return render(request, 'home.html', {'data': uri})
+        return render(request, 'home.html', {'data': uri, 'ticker': ticker.upper(), 'currentprice': currentprice})
 
     else:
         return render(request, 'home.html', {'greeting': "Enter a Ticker Symbol to get infomation"})
