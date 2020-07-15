@@ -1,1 +1,20 @@
-<h1>Hello world!</h1>
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+{% if greeting %}
+    {{ greeting }}
+{% endif %}
+
+{% if data %}
+    {% if data == "Error" %}
+        There was a problem with your request, please check your input
+    {% else %}
+    <img src="data:image/png;base64,{{ data }}" alt="" height="300" ,width="250">
+    {% endif %}
+{% endif %}
+
+
+
+{% endblock %}
