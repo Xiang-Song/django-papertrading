@@ -76,6 +76,7 @@ def get(request, Portfolios_id):
     response = home(request, context)   #call home view and update context
     return response
 
+
 def update(request):
     if request.method == "POST":
         form = TransactionForm(request.POST)
@@ -141,3 +142,13 @@ def reset(request):
     balance.save()
 
     return redirect('home')    
+
+
+def history(request):
+    history = Transactions.objects.all()
+
+    return render(request, 'history.html', {'history': history})
+
+
+def symbol(request):
+    return render(request, 'symbol.html')

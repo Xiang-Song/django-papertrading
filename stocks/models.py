@@ -25,6 +25,6 @@ class Balance(models.Model):
     cash = models.DecimalField('USD amount', default=200000, max_digits=8, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
-        return '{}'.format(self.cash)
+        return '{}'.format(self.cash) # if not string use this format
          
     
