@@ -133,4 +133,11 @@ def update(request):
     return redirect('home')
    
 
-    
+def reset(request):
+    Transactions.objects.all().delete()
+    Portfolios.objects.all().delete()
+    balance = Balance.objects.get(pk=2)
+    balance.cash = 200000
+    balance.save()
+
+    return redirect('home')    
