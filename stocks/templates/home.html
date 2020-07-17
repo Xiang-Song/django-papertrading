@@ -1,21 +1,99 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class ="row">
+    
+    <div class="col-7">
+        <h3>My Portfolio</h3>
+        <table class="table table-bordered">
+            <thead class = "thead-dark">
+              <tr>
+                <th scope="col">Stock</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Value</th>
+                <th scope="col">Buy/Sell</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% if portfolio %}
+                
+                    {% for item in portfolio %}
+                    <tr>
+                        <th scope="row">{{ item.ticker }}</th>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.price }}</td>
+                        <td><a href = "{% url 'get' item.id %}">select</a></td>
+                      </tr>
+                    {% endfor %}
+                {% endif %}
+              <tr>
+                <th scope="row">Remaining cash</th>
+                <td colspan="3">{{ cash }}</td>
+              </tr>
+            </tbody>
+          </table>
+    </div>
+    <div class ='col-5'>
+        <h3>Selected stock from your portfolio</h3><br/>
+        
+        <h5>{{ selected.cash }}</h5>
+        
+        <b>Stock: </b> {{ selected.ticker }} | <b>Current Price: </b>{{ selected.price}} | <b>Share: </b> {{ selected.quantity}}
+        
+        
+    </div>
+</div>
+<hr/>
+<div class ="row">
+    
+    <div class ='col-3'>
 
-
-{% if greeting %}
-    {{ greeting }}
-{% endif %}
-
-{% if data %}
-    {% if data == "Error" %}
-        There was a problem with your request, please check your input
-    {% else %}
-    <h1> {{ ticker }}- Current Price: {{ currentprice}} &nbsp USD </h1>
-    <img src="data:image/png;base64,{{ data }}" alt="" height="300", width="700">
-    {% endif %}
-{% endif %}
-
-
+    </div>
+    <div class ='col-5'>
+        <h3>Stock trends --- Check and Trade</h3>
+    </div>
+    <div class ='col-4'>
+        <form action = "{% url 'home' %}" class="form-inline my-2 my-lg-0" method="POST">
+            {% csrf_token %}
+          <input class="form-control mr-sm-2" type="search" placeholder="Get Stock Quote" aria-label="Search" name="ticker">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Stock Quote</button>
+        </form>
+    </div>
+</div>
+<div class='row'>
+    
+    <div class="col-8">
+        {% if greeting %}
+            {{ greeting }}
+        {% endif %}
+        
+        {% if data %}
+            {% if data == "Error" %}
+                There was a problem with your request, please check your input
+            {% else %}
+            
+            <img src="data:image/png;base64,{{ data }}" alt="" height="300", width="700">
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class ='col-4'>
+        <br/>
+        {% if ticker %}
+        <h3> {{ ticker }}- Current Price: {{ currentprice }} &nbsp USD </h3>
+        {% endif %}
+        <br/>
+        <form action = "{% url 'update' %}" class="form-inline my-2 my-lg-0" method="POST">
+            {% csrf_token %}
+            <label>Quantity: </label>
+            <input class="form-control mr-sm-1" type="search"  aria-label="Search" name="quantity"> 
+            <input type ='submit' value = 'Buy' class="btn btn-primary" name="trade" />
+            &nbsp &nbsp
+            <input type ='submit' value = 'Sell' class="btn btn-danger" name="trade" />
+            <input value = '{{ticker}}' class='d-none' name = 'ticker' />
+            <input value = '{{currentprice}}' class='d-none' name = 'price' />
+        </form>
+        {{ warning }}
+    </div>
+</div>
 
 {% endblock %}
