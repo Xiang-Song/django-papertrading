@@ -39,7 +39,16 @@
         <h5>{{ selected.cash }}</h5>
         
         <b>Stock: </b> {{ selected.ticker }} | <b>Current Price: </b>{{ selected.price}} | <b>Share: </b> {{ selected.quantity}}
-        
+        <form action = "{% url 'update' %}" class="form-inline my-2 my-lg-0" method="POST">
+            {% csrf_token %}
+            <label>Quantity: </label>
+            <input class="form-control mr-sm-1" type="search"  aria-label="Search" name="quantity"> 
+            <input type ='submit' value = 'Buy' class="btn btn-primary" name="trade" />
+            &nbsp &nbsp
+            <input type ='submit' value = 'Sell' class="btn btn-danger" name="trade" />
+            <input value = '{{selected.ticker}}' class='d-none' name = 'ticker' />
+            <input value = '{{selected.price}}' class='d-none' name = 'price' />
+        </form>
         
     </div>
 </div>
