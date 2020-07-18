@@ -1,4 +1,4 @@
-# JerseyShop
+# Django-paper-trading
 ### Author
 Xiang Song
 
