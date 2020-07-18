@@ -53,7 +53,7 @@ def home(request, newContext={}):   #newContext could be used by another view to
             }
             context.update(newContext)    #update context if this view been called from another view
             return render(request, 'home.html', context)
-        except:
+        except:   # if ticker not exist, return waringing info
             context = {
                 'cash': cash,
                 'portfolio': portfolio,
@@ -62,7 +62,7 @@ def home(request, newContext={}):   #newContext could be used by another view to
             }
             return render(request, 'home.html', context)
 
-    else:
+    else:   # no POST request, return current portfolio
         context = {
             'cash': cash,
             'portfolio': portfolio,
@@ -73,7 +73,7 @@ def home(request, newContext={}):   #newContext could be used by another view to
         return render(request, 'home.html', context)
 
 
-def get(request, Portfolios_id):
+def get(request, Portfolios_id):   # retrieve particular stock info from portfolio
     item = Portfolios.objects.get(pk=Portfolios_id)
     now = datetime.date.today()
     nowdata = yf.download(item.ticker, start=now)
@@ -86,7 +86,7 @@ def get(request, Portfolios_id):
     return response
 
 
-def update(request):
+def update(request):   # handle buy/sell request
     if request.method == "POST":
         form = TransactionForm(request.POST)
         pform = PortfolioForm(request.POST)
@@ -147,7 +147,7 @@ def update(request):
     return redirect('home')
    
 
-def reset(request):
+def reset(request):   # reset to initial status
     Transactions.objects.all().delete()
     Portfolios.objects.all().delete()
     balance = Balance.objects.get(pk=2)
@@ -157,7 +157,7 @@ def reset(request):
     return redirect('home')    
 
 
-def history(request):
+def history(request):   # return transaction record
     history = Transactions.objects.all()
 
     return render(request, 'history.html', {'history': history})
