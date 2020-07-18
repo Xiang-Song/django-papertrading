@@ -97,9 +97,10 @@ def update(request):
                     }
                     response = home(request, context)
                     return response
-
-                balance.cash -= round(price * quantity, 2)
-                balance.save()   #always remember to save
+                else:
+                    form.save() 
+                    balance.cash -= round(price * quantity, 2)
+                    balance.save()   #always remember to save   
             elif trade == 'Sell':
                 try:
                     ptfl = Portfolios.objects.get(ticker=ticker)
@@ -109,16 +110,16 @@ def update(request):
                         }
                         response = home(request, context)
                         return response
+                    else:
+                        form.save()
+                        balance.cash += round(price * quantity, 2)
+                        balance.save()
                 except:
                     context = {
                         'warning': "You don't have this stock for sell!"
                     }
                     response = home(request, context)
                     return response
-
-                balance.cash += round(price * quantity, 2)
-                balance.save()
-            form.save()
 
         if pform.is_valid():
             try:      # it is possible that entry not exist, so use 'try' not 'if', because if entry not exist, django will report error
@@ -128,7 +129,10 @@ def update(request):
                     entry.save()
                 elif trade == 'Sell':
                     entry.quantity -= quantity
-                    entry.save()
+                    if entry.quantity == 0:
+                        entry.delete()
+                    else:
+                        entry.save()
             except:
                 pform.save()
     return redirect('home')
