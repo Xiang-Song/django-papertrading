@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<br/>
+<div class="d-flex justify-content-center"> <h1>Check and Trade --- <i>your portfolio</i></h1></div>
+<hr/>
 <div class ="row">
-    
     <div class="col-7">
-        <h3>My Portfolio</h3>
         <table class="table table-bordered">
             <thead class = "thead-dark">
               <tr>
@@ -27,17 +28,20 @@
                     {% endfor %}
                 {% endif %}
               <tr>
-                <th scope="row">Remaining cash</th>
-                <td colspan="3">{{ cash }}</td>
+                <th scope="row">Cash available</th>
+                <td >{{ cash }}</td>
+                <td>Current asset</td>
+                <td>{{ totalvalue }}</td>
               </tr>
             </tbody>
           </table>
     </div>
-    <div class ='col-5'>
+    <div class ='col-5' >
+        
         <h3>Selected stock from your portfolio</h3><br/>
-        
-        <h5>{{ selected.cash }}</h5>
-        
+        <h6><b>Stock: </b> {{ selected.ticker }}</h6><br/> 
+        <h6><b>Current Price (USD): </b>{{ selected.price}}</h6><br/> 
+        <h6><b>Your Share: </b> {{ selected.quantity}}</h6><br/>      
         <b>Stock: </b> {{ selected.ticker }} | <b>Current Price: </b>{{ selected.price}} | <b>Share: </b> {{ selected.quantity}}
         <form action = "{% url 'update' %}" class="form-inline my-2 my-lg-0" method="POST">
             {% csrf_token %}
@@ -51,18 +55,22 @@
         </form>
         
     </div>
-    <div class="alert alert-danger" role="alert">
-        {{ warning }}
-    </div>
+    
 </div>
+<div class="d-flex justify-content-center" style="color: red">
+        <h3>{{ warning }}</h3>
+</div>
+<hr style = "height:1px; border-width:0; color:black; background-color: black;" />
+<br/>
+<div class="d-flex justify-content-center"> <h1>Check and Trade --- <i>30 days trends</i></h1></div>
 <hr/>
 <div class ="row">
     
-    <div class ='col-3'>
-
-    </div>
     <div class ='col-5'>
-        <h3>Stock trends --- Check and Trade</h3>
+        <h3>Enter a ticker symbol to get quote: </h3>
+    </div>
+    <div class ='col-3' style="color: red" >
+        <h3>{{ searchwarning }}</h3>
     </div>
     <div class ='col-4'>
         <form action = "{% url 'home' %}" class="form-inline my-2 my-lg-0" method="POST">
@@ -70,30 +78,17 @@
           <input class="form-control mr-sm-2" type="search" placeholder="Get Stock Quote" aria-label="Search" name="ticker">
           <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Stock Quote</button>
         </form>
+        
     </div>
 </div>
+<hr/>
+
 <div class='row'>
     
-    <div class="col-8">
-        {% if greeting %}
-            {{ greeting }}
-        {% endif %}
-        
-        {% if data %}
-            {% if data == "Error" %}
-                There was a problem with your request, please check your input
-            {% else %}
-            
-            <img src="data:image/png;base64,{{ data }}" alt="" height="300", width="700">
-            {% endif %}
-        {% endif %}
-    </div>
-    <div class ='col-4'>
+    <div class ='col-5'>
         <br/>
-        {% if ticker %}
-        <h3> {{ ticker }}- Current Price: {{ currentprice }} &nbsp USD </h3>
-        {% endif %}
-        <br/>
+        <h6><b>Stock: </b> {{ ticker }}</h6><br/> 
+        <h6><b>Current Price (USD): </b>{{ currentprice }}</h6><br/> 
         <form action = "{% url 'update' %}" class="form-inline my-2 my-lg-0" method="POST">
             {% csrf_token %}
             <label>Quantity: </label>
@@ -104,8 +99,15 @@
             <input value = '{{ticker}}' class='d-none' name = 'ticker' />
             <input value = '{{currentprice}}' class='d-none' name = 'price' />
         </form>
-        
     </div>
+   
+    {% if data %}
+    <div class="col-7">
+            <img src="data:image/png;base64,{{ data }}" alt="" height="300", width="700">
+    </div>
+    {% endif %}
+
 </div>
+
 
 {% endblock %}

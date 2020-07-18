@@ -26,12 +26,16 @@
                 <a class="nav-link" href="/stocks/symbol">Ticker Symbol List <span class="sr-only">(current)</span></a>
               </li>
           </ul>
-          <a href="{% url 'reset' %}"><button class="btn btn-success"> Reset </button></a>
+          <a href="{% url 'reset' %}"><button class="btn btn-success"> Reset to initial balance($200,000) </button></a>
         </div>
       </nav>
     <div class="container-fluid">
     {% block content %}
     {% endblock %}
+    </div>
+    <br/><br/>
+    <div class="card-footer text-muted">
+        <p class="d-flex justify-content-center">Like what you see? Contact @ himmelsong@gmail.com</p>
     </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

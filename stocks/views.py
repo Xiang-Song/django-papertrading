@@ -12,25 +12,26 @@ from .forms import TransactionForm, PortfolioForm
 def home(request, newContext={}):   #newContext could be used by another view to call this view and update context
     portfolio = Portfolios.objects.all()
     now = datetime.date.today()
+    totalvalue = 0
     for item in portfolio:
         nowdata = yf.download(item.ticker, start=now)
         nowdata.reset_index(inplace=True)
         nowprice = round(nowdata.iloc[0]['Close'], 2)
         item.price = round(nowprice * item.quantity, 2)
-    
+        totalvalue += item.price
     balanc = Balance.objects.get(pk=2)
     cash = balanc.cash
-
+    totalvalue = round((float(cash) + totalvalue), 2)
     if request.method == "POST":
         ticker = request.POST['ticker']
         today = datetime.date.today()
         d = datetime.timedelta(days = 30)
         startday = today - d
-        todaydata = yf.download(ticker, start=today)
-        todaydata.reset_index(inplace=True)
-        currentprice = round(todaydata.iloc[0]['Close'], 2) # iloc to retrieve data in particular cell
-        monthdata = yf.download(ticker, start=startday)
-        if len(monthdata.index) > 0:
+        try:
+            todaydata = yf.download(ticker, start=today)
+            todaydata.reset_index(inplace=True)
+            currentprice = round(todaydata.iloc[0]['Close'], 2) # iloc to retrieve data in particular cell
+            monthdata = yf.download(ticker, start=startday)
             df = monthdata.reset_index()
             plt.clf()   # to clear previous figure
             plt.plot(df.Date, df.Close)
@@ -42,23 +43,31 @@ def home(request, newContext={}):   #newContext could be used by another view to
             buf.seek(0)
             string = base64.b64encode(buf.read())
             uri =  urllib.parse.quote(string)
-        else:
-            uri = "Error"
-        context = {
-            'data': uri, 
-            'ticker': ticker.upper(), 
-            'currentprice': currentprice,
-            'cash': cash,
-            'portfolio': portfolio
-        }
-        context.update(newContext)    #update context if this view been called from another view
-        return render(request, 'home.html', context)
+            context = {
+                'data': uri, 
+                'ticker': ticker.upper(), 
+                'currentprice': currentprice,
+                'cash': cash,
+                'portfolio': portfolio,
+                'totalvalue': totalvalue
+            }
+            context.update(newContext)    #update context if this view been called from another view
+            return render(request, 'home.html', context)
+        except:
+            context = {
+                'cash': cash,
+                'portfolio': portfolio,
+                'totalvalue': totalvalue,
+                'searchwarning': 'Your input ticker does not exist'
+            }
+            return render(request, 'home.html', context)
 
     else:
         context = {
-            'greeting': "Enter a Ticker Symbol to get infomation", 
             'cash': cash,
-            'portfolio': portfolio
+            'portfolio': portfolio,
+            'totalvalue': totalvalue
+
         }
         context.update(newContext)
         return render(request, 'home.html', context)
