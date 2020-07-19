@@ -12,26 +12,27 @@ from .forms import TransactionForm, PortfolioForm
 def home(request, newContext={}):   #newContext could be used by another view to call this view and update context
     portfolio = Portfolios.objects.all()
     now = datetime.date.today()
+    weekday = datetime.timedelta(days = 5)
+    checkdate = now - weekday
+    monthday = datetime.timedelta(days = 30)
+    startdate = now - monthday
     totalvalue = 0
     for item in portfolio:
-        nowdata = yf.download(item.ticker, start=now)
-        nowdata.reset_index(inplace=True)
-        nowprice = round(nowdata.iloc[0]['Close'], 2)
-        item.price = round(nowprice * item.quantity, 2)
+        checkdata = yf.download(item.ticker, start=checkdate)
+        index = len(checkdata) - 1
+        checkprice = round(checkdata.iloc[index]['Close'], 2)
+        item.price = round(checkprice * item.quantity, 2)
         totalvalue += item.price
     balanc = Balance.objects.get(pk=2)
     cash = balanc.cash
     totalvalue = round((float(cash) + totalvalue), 2)
     if request.method == "POST":
         ticker = request.POST['ticker']
-        today = datetime.date.today()
-        d = datetime.timedelta(days = 30)
-        startday = today - d
         try:
-            todaydata = yf.download(ticker, start=today)
-            todaydata.reset_index(inplace=True)
-            currentprice = round(todaydata.iloc[0]['Close'], 2) # iloc to retrieve data in particular cell
-            monthdata = yf.download(ticker, start=startday)
+            weekdata = yf.download(ticker, start=checkdate)
+            index = len(weekdata) - 1
+            currentprice = round(weekdata.iloc[index]['Close'], 2) # iloc to retrieve data in particular cell
+            monthdata = yf.download(ticker, start=startdate)
             df = monthdata.reset_index()
             plt.clf()   # to clear previous figure
             plt.plot(df.Date, df.Close)
@@ -76,9 +77,11 @@ def home(request, newContext={}):   #newContext could be used by another view to
 def get(request, Portfolios_id):   # retrieve particular stock info from portfolio
     item = Portfolios.objects.get(pk=Portfolios_id)
     now = datetime.date.today()
-    nowdata = yf.download(item.ticker, start=now)
-    nowdata.reset_index(inplace=True)
-    item.price = round(nowdata.iloc[0]['Close'], 2)
+    weekday = datetime.timedelta(days = 5)
+    checkdate = now - weekday
+    checkdata = yf.download(item.ticker, start=checkdate)
+    index = len(checkdata) - 1
+    item.price = round(checkdata.iloc[index]['Close'], 2)
     context = {
         'selected': item
     }
